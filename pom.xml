@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.3</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.timesync</groupId>
+    <artifactId>timesync-automator</artifactId>
+    <version>1.0.0</version>
+    <name>timesync-automator</name>
+    <description>TimeSync Automator</description>
+
+    <properties>
+        <java.version>21</java.version>
+        <ical4j.version>4.1.0</ical4j.version>
+        <guava.version>33.4.0-jre</guava.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mnode.ical4j</groupId>
+            <artifactId>ical4j</artifactId>
+            <version>${ical4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.connectors</groupId>
+            <artifactId>jersey-jetty-connector</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <image>
+                        <builder>dashaun/builder:tiny</builder>
+                        <createdDate>now</createdDate>
+                        <env>
+                            <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+                            <BP_NATIVE_IMAGE_BUILD_ARGUMENTS>--enable-https</BP_NATIVE_IMAGE_BUILD_ARGUMENTS>
+                        </env>
+                    </image>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
