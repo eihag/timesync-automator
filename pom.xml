@@ -18,7 +18,7 @@
     <properties>
         <java.version>21</java.version>
         <ical4j.version>4.1.1</ical4j.version>
-        <guava.version>33.4.6-jre</guava.version>
+        <guava.version>33.4.8-jre</guava.version>
     </properties>
 
     <dependencies>
