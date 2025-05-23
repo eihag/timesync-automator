@@ -41,24 +41,29 @@ It automatically detect vacation plans + company holidays registered in BambooHR
 - A Bamboo iCal URL to fetch company holidays
 
 ## Build + Configuration
-It is assumed you already have configured Java 21 / maven on your system for compiling. The build will create a native docker image.
+It is assumed you already have configured GraalVM / maven on your system for compiling. The build will create a native executable
 
 Steps:
 1. Configure - create a `application.properties` in `src/main/resources` directory. See `application-SAMPLE.properties`, rename, and fill in the blanks (JIRA username etc.).
-2. Compile to native docker image `mvn -Pnative spring-boot:build-image`
-3. Run - example: `docker run timesync-automator:1.0.0 dry-run today`
+2. Compile to native docker image `mvn clean package -Pnative`
+3. Run - example: `./timesync-automator dry-run today`
+
+If you prefer, you can still build a docker image: `mvn spring-boot:build-image` (works without GraalVM)
+
+## GraalVM
+To install GraalVM with MacOS/homebrew: `brew install graalvm-jdk`
 
 ## Usage
 ```
-docker run timesync-automator:1.0.0 dry-run <startDate> <endDate>
-docker run timesync-automator:1.0.0 log-work <startDate> <endDate>
-docker run timesync-automator:1.0.0 report <startDate> <endDate>
+timesync-automator dry-run <startDate> <endDate>
+timesync-automator log-work <startDate> <endDate>
+timesync-automator report <startDate> <endDate>
 ```
 
 Examples:
 ```
-docker run timesync-automator:1.0.0 log-work 2025-02-01 2025-02-28
-docker run timesync-automator:1.0.0 report 2025-02-01 2025-02-28
+timesync-automator log-work 2025-02-01 2025-02-28
+timesync-automator report 2025-02-01 2025-02-28
 ```
 You can still also run the jar file directly:
 ```
