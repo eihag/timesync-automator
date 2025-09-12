@@ -45,7 +45,7 @@ It is assumed you already have configured GraalVM / maven on your system for com
 
 Steps:
 1. Configure - create a `application.properties` in `src/main/resources` directory. See `application-SAMPLE.properties`, rename, and fill in the blanks (JIRA username etc.).
-2. Compile to native docker image `mvn clean package -Pnative`
+2. Compile to native executable `mvn clean package -Pnative`
 3. Run - example: `./timesync-automator dry-run today`
 
 If you prefer, you can still build a docker image: `mvn spring-boot:build-image` (works without GraalVM)

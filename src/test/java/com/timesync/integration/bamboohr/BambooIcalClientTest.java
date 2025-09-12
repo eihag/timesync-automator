@@ -19,6 +19,9 @@ class BambooIcalClientTest {
     void getCompanyHolidays() {
         List<CompanyHolidaySimpleDto> companyHolidays = bambooIcalClient.getCompanyHolidays();
         assertNotNull(companyHolidays);
+        for (CompanyHolidaySimpleDto holiday : companyHolidays) {
+            System.out.println(holiday);
+        }
     }
 
 }
