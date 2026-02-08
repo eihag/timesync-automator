@@ -5,30 +5,42 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDate;
+import java.time.Year;
+import java.util.Calendar;
+
 @SpringBootTest
 class TimeSyncServiceTest {
+
+    private final int year = Year.now().getValue();
+    private final LocalDate startOfYear = LocalDate.of(year, 1, 1);
 
     @Inject
     private TimeSyncService timeSyncService;
 
+
     @Test
     void testReportTimeLogged() {
-        timeSyncService.reportJiraAndBamboo(DateUtil.parseDate("2025-01-01"), DateUtil.parseDate("2025-02-28"), true);
+        timeSyncService.reportJiraAndBamboo(startOfYear, LocalDate.of(year, 2, 28), true);
     }
 
     @Test
     void testReportTimeLoggedFullYear() {
-        timeSyncService.reportJiraAndBamboo(DateUtil.parseDate("2025-01-01"), DateUtil.parseDate("2025-12-31"), true);
+        timeSyncService.reportJiraAndBamboo(startOfYear, LocalDate.of(year, 12, 31), true);
     }
 
     @Test
     void testReportTimeLoggedWithBamboo() {
-        timeSyncService.reportJiraAndBamboo(DateUtil.parseDate("2025-01-01"), DateUtil.parseDate("2025-01-14"), false);
+        timeSyncService.reportJiraAndBamboo(startOfYear, LocalDate.of(year, 1, 14), false);
     }
 
     @Test
     void testlogTimed() {
-        timeSyncService.logBambooWork(DateUtil.parseDate("2025-01-01"), DateUtil.parseDate("2025-02-28"), true, true);
+        timeSyncService.logBambooWork(startOfYear, LocalDate.of(year, 2, 28), true, true);
+    }
+
+    private String getYear() {
+        return "" + Calendar.getInstance().get(Calendar.YEAR);
     }
 
 }
