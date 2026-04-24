@@ -13,6 +13,7 @@ import com.timesync.integration.jira.model.Issue;
 import com.timesync.integration.jira.model.IssueList;
 import com.timesync.integration.jira.model.WorkLog;
 import com.timesync.integration.jira.model.WorkLogList;
+import com.timesync.integration.nager.NagerDateClient;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,9 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TimeSyncService {
@@ -40,18 +43,21 @@ public class TimeSyncService {
     private final JiraRestClient jiraRestClient;
     private final BambooRestClient bambooRestClient;
     private final BambooIcalClient bambooIcalClient;
+    private final NagerDateClient nagerDateClient;
 
-    public TimeSyncService(JiraRestClient jiraRestClient, BambooRestClient bambooRestClient, BambooIcalClient bambooIcalClient) {
+    public TimeSyncService(JiraRestClient jiraRestClient, BambooRestClient bambooRestClient,
+                           BambooIcalClient bambooIcalClient, NagerDateClient nagerDateClient) {
         this.jiraRestClient = jiraRestClient;
         this.bambooRestClient = bambooRestClient;
         this.bambooIcalClient = bambooIcalClient;
+        this.nagerDateClient = nagerDateClient;
     }
 
     public void reportJiraAndBamboo(LocalDate startDate, LocalDate endDate, boolean bambooOnly) {
         StringBuilder sb = new StringBuilder("\nDate\t\t\t\t\tJIRA\tBamboo\n");
         List<TimeRegistrationEntry> timeRegistrationEntries = bambooRestClient.getTimeRegistrationForDatePeriod(startDate, endDate);
         List<TimeOffSimpleDto> vacations = getVacations(startDate, endDate);
-        List<CompanyHolidaySimpleDto> companyHolidays = bambooIcalClient.getCompanyHolidays();
+        List<CompanyHolidaySimpleDto> companyHolidays = getFilteredCompanyHolidays(startDate, endDate);
 
         LocalDate date = startDate;
         while (!endDate.isBefore(date)) {
@@ -76,7 +82,7 @@ public class TimeSyncService {
         TimesheetRegisterClockEntries newEntries = new TimesheetRegisterClockEntries();
         List<TimeRegistrationEntry> timeRegistrationEntries = bambooRestClient.getTimeRegistrationForDatePeriod(startDate, endDate);
         List<TimeOffSimpleDto> vacations = getVacations(startDate, endDate);
-        List<CompanyHolidaySimpleDto> companyHolidays = bambooIcalClient.getCompanyHolidays();
+        List<CompanyHolidaySimpleDto> companyHolidays = getFilteredCompanyHolidays(startDate, endDate);
 
         LocalDate date = startDate;
         while (!endDate.isBefore(date)) {
@@ -151,13 +157,24 @@ public class TimeSyncService {
 
 
     private boolean isCompanyHoliday(LocalDate date, List<CompanyHolidaySimpleDto> companyHolidays, StringBuilder sb) {
-        for (CompanyHolidaySimpleDto vacation : companyHolidays) {
-            if (date.equals(vacation.date())) {
-                writeDateEntry(date, vacation.name(), sb);
+        for (CompanyHolidaySimpleDto holiday : companyHolidays) {
+            if (date.equals(holiday.date())) {
+                writeDateEntry(date, holiday.name(), sb);
                 return true;
             }
         }
         return false;
+    }
+
+    private List<CompanyHolidaySimpleDto> getFilteredCompanyHolidays(LocalDate startDate, LocalDate endDate) {
+        Set<LocalDate> countryHolidayDates = new HashSet<>();
+        for (int year = startDate.getYear(); year <= endDate.getYear(); year++) {
+            countryHolidayDates.addAll(nagerDateClient.getHolidayDatesForYear(year));
+        }
+        return bambooIcalClient.getCompanyHolidays().stream()
+                .filter(h -> !h.date().isBefore(startDate) && !h.date().isAfter(endDate))
+                .filter(h -> countryHolidayDates.contains(h.date()))
+                .toList();
     }
 
     private int getJiraWork(LocalDate date) {

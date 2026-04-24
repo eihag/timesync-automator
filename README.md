@@ -40,6 +40,13 @@ It automatically detect vacation plans + company holidays registered in BambooHR
 - A BambooHR API key with access to your time registrations + time off requests
 - A Bamboo iCal URL to fetch company holidays
 
+> **Note on company holidays**: BambooHR's iCal `Company Holidays` feed is not location-filtered
+> and returns events for every location configured in BambooHR. To get only the holidays that apply
+> to your location, the iCal events are intersected with the public holidays from
+> [date.nager.at](https://date.nager.at) (all types, including Bank/Optional such as Constitution Day
+> and Christmas Eve). Set `holidays_country_code` and `nager_base_url` in
+> `application.properties` to override.
+
 ## Build + Configuration
 It is assumed you already have configured GraalVM / maven on your system for compiling. The build will create a native executable
 
@@ -47,6 +54,11 @@ Steps:
 1. Configure - create a `application.properties` in `src/main/resources` directory. See `application-SAMPLE.properties`, rename, and fill in the blanks (JIRA username etc.).
 2. Compile to native executable `mvn clean package -Pnative`
 3. Run - example: `./timesync-automator dry-run today`
+
+Copy binary executable to `/usr/local/bin`:
+```
+sudo cp ./target/timesync-automator /usr/local/bin
+```
 
 If you prefer, you can still build a docker image: `mvn spring-boot:build-image` (works without GraalVM)
 
